@@ -15,6 +15,7 @@ describe('#hello.js', () => {
 
         it('sum(1, 2) should return 3', () => {
             assert.strictEqual(sum(1, 2), 3);
+            assert.strictEqual(sum(1, 2), 3);
         });
 
         it('sum(1, 2, 3) should return 6', () => {

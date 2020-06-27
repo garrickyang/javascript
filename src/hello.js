@@ -5,5 +5,3 @@ module.exports = function (...rest) {
     }
     return sum;
 };
-var s = "HelloWorld";
-console.log(s);

@@ -1,13 +1,13 @@
  require('babel-register');
- 
+
  function statement(invoice, plays){
  	let totalAmout=0;
  	let volumeCredits=0;
- 	let result='Statement for ${invoice.customer}\n';
+ 	let result=`Statement for ${invoice.customer}\n`;
  	const format = new Intl.NumberFormat("en-Us",{style:"currency",currency:"USD",minimumFractionDigits:2}).format;
 
  	for (let perf of invoice.performances) {
- 		const play = play[perf.playID];
+ 		const play = plays[perf.playID];
  		let thisAmout=0;
 
  		switch (play.type){
@@ -32,25 +32,26 @@
 
  		if("comedy"===play.type) volumeCredits+=Math.floor(perf.audience/5);
 
- 		result+='${play.name}:${format(thisAmout/100)} (${perf.audience} seats)\n';
+ 		result+=`${play.name}:${format(thisAmout/100)} (${perf.audience} seats)\n`;
  		totalAmout+=thisAmout;
  	}
- 	result+='Amount owed is ${format(totalAmout/100}\n';
- 	result+='You earned ${volumeCredits} credits\n';
+ 	result+=`Amount owed is ${format(totalAmout/100)}\n`;
+ 	result+=`You earned ${volumeCredits} credits\n`;
  	return result;
  }
 
 
- function adds(...rest){
- 	var sum = 0;
- 	for (let n of rest) {
- 		sum += n;
- 	}
- 	return sum;
- }
- export {adds, statement}
 
- console.log(adds(1,2)) 
+ export {statement,loadJson};
+
+ function  loadJson(filePath){
+ 	const fs = require('fs');
+ 	let fileString=fs.readFileSync(filePath,'utf8');
+ 	let result=JSON.parse(fileString)
+ 	return result;
+ } 
+ //loadJson('plays.json');
+
 
 
 
