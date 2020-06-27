@@ -1,58 +1,40 @@
- require('babel-register');
+import {createStatementData} from "./createStatementData.js"
 
- function statement(invoice, plays){
- 	let totalAmout=0;
- 	let volumeCredits=0;
- 	let result=`Statement for ${invoice.customer}\n`;
- 	const format = new Intl.NumberFormat("en-Us",{style:"currency",currency:"USD",minimumFractionDigits:2}).format;
+function statement(invoice, plays){
 
- 	for (let perf of invoice.performances) {
- 		const play = plays[perf.playID];
- 		let thisAmout=0;
+	return renderPlainText(createStatementData(invoice, plays));
 
- 		switch (play.type){
- 			case "tragedy":
- 				thisAmout=40000;
- 				if(perf.audience>30){
- 					thisAmout+=1000*(perf.audience-30);
- 				}
- 				break;
- 			case "comedy":
- 				thisAmout=30000;
- 				if(perf.audience>20){
- 					thisAmout+=10000+500*(perf.audience);
- 				}
- 				thisAmout+=300*perf.audience;
- 				break;
- 				default:
- 					throw new Error('unknow type: ${play.type}');
- 		}
+}
 
- 		volumeCredits+=Math.max(perf.audience-30,0);
+function renderPlainText(data, plays){
+	let totalAmout=0;
 
- 		if("comedy"===play.type) volumeCredits+=Math.floor(perf.audience/5);
+	let result=`Statement for ${data.customer}\n`;
 
- 		result+=`${play.name}:${format(thisAmout/100)} (${perf.audience} seats)\n`;
- 		totalAmout+=thisAmout;
- 	}
- 	result+=`Amount owed is ${format(totalAmout/100)}\n`;
- 	result+=`You earned ${volumeCredits} credits\n`;
- 	return result;
- }
+	for (let perf of data.performances) {
+		result+=`${perf.play.name}:${usdFormat(perf.amount/100)} (${perf.audience} seats)\n`;
+	}
+
+	result+=`Amount owed is ${usdFormat(data.totalAmount/100)}\n`;
+	result+=`You earned ${data.totalVolumeCredits} credits\n`;
+	return result;
+
+}
+function usdFormat(aNumber){
+	return new Intl.NumberFormat("en-Us",{style:"currency",currency:"USD",
+		minimumFractionDigits:2}).format(aNumber);
+}
 
 
 
- export {statement,loadJson};
+function  loadJson(filePath){
+	const fs = require('fs');
+	let fileString=fs.readFileSync(filePath,'utf8');
+	let result=JSON.parse(fileString)
+	return result;
+} 
 
- function  loadJson(filePath){
- 	const fs = require('fs');
- 	let fileString=fs.readFileSync(filePath,'utf8');
- 	let result=JSON.parse(fileString)
- 	return result;
- } 
- //loadJson('plays.json');
-
-
+export {statement,loadJson};
 
 
 
